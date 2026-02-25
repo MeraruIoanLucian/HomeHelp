@@ -24,6 +24,7 @@ interface AuthState {
     signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<{ error: string | null }>
     signIn: (email: string, password: string) => Promise<{ error: string | null }>
     signOut: () => Promise<void>
+    refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined)
@@ -91,8 +92,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null)
     }
 
+    async function refreshProfile() {
+        if (user) await fetchProfile(user.id)
+    }
+
     return (
-        <AuthContext.Provider value={{ user, session, profile, loading, signUp, signIn, signOut }}>
+        <AuthContext.Provider value={{ user, session, profile, loading, signUp, signIn, signOut, refreshProfile }}>
             {children}
         </AuthContext.Provider>
     )

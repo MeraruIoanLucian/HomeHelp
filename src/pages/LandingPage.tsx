@@ -8,7 +8,7 @@ export default function LandingPage() {
             <div className="absolute inset-0">
                 <Grainient
                     color1="#a6f9d9"
-                    color2="#2b34ff"
+                    color2="#2563eb"
                     color3="#f1c9fe"
                     timeSpeed={0.6}
                     colorBalance={0.11}
