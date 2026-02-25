@@ -19,6 +19,10 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Project docs (local only)
+CONVENTIONS.md
+HomeHelp_Final.md
+
 # Logs
 *.log
 npm-debug.log*

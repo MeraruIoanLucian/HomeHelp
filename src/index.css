@@ -63,3 +63,18 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* Shared component styles */
+@layer components {
+  .input {
+    @apply w-full px-4 py-2.5 rounded-lg border border-surface-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm;
+  }
+
+  .btn-primary {
+    @apply w-full py-2.5 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50;
+  }
+
+  .error-msg {
+    @apply text-sm text-danger-500 bg-red-50 rounded-lg px-3 py-2;
+  }
+}
