@@ -4,13 +4,17 @@ import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import HeroBackground from '../components/HeroBackground'
 
-export default function HomePage() {
+export default function CreateJobPage() {
     const { profile, signOut } = useAuth()
     const navigate = useNavigate()
 
     async function handleSignOut() {
         await signOut()
         navigate('/')
+    }
+
+    if (profile?.role == 'helper') {
+        navigate('/home')
     }
 
     return (
@@ -34,17 +38,22 @@ export default function HomePage() {
                 <div className="pt-32 px-6 max-w-2xl mx-auto">
                     <div className="rounded-xl bg-white/30 backdrop-blur p-2 justify-center mb-6">
                         <div className="flex justify-center">
-                            <h1 className="text-4xl font-bold text-[#fff]">Home</h1>
+                            <h1 className="text-4xl font-bold text-[#fff]">Create a Job</h1>
                         </div>
                     </div>
-                    {profile && (
-                        <div className="bg-white/30 backdrop-blur rounded-xl shadow-sm p-6">
-                            <p className="text-2xl font-medium text-[#fff]">{profile.full_name}</p>
-                            <p className="text-lg text-[#fff] mt-1">
-                                Role: <span className="font-medium capitalize">{profile.role === 'helped' ? '🏠 Homeowner' : '🔧 Technician'}</span>
-                            </p>
-                        </div>
-                    )}
+                    <div className="bg-white/30 backdrop-blur rounded-xl shadow-sm p-50">
+                        <p className="text-lg text-[#fff] mt-5">
+                            <form>
+                                <label htmlFor="title">Job Title</label>
+                                <input type="text" id="title" name="title" className="w-full px-4 py-2 border border-gray-300 rounded-md" />
+                                <label htmlFor="description">Job Description</label>
+                                <input type="text" id="description" name="description" className="w-full px-4 py-2 border border-gray-300 rounded-md" />
+                                <label htmlFor="price">Job Price</label>
+                                <input type="text" id="price" name="price" className="w-full px-4 py-2 border border-gray-300 rounded-md" />
+                                <button type="submit">Create Job</button>
+                            </form>
+                        </p>
+                    </div>
                 </div>
             </HeroBackground>
         </div>

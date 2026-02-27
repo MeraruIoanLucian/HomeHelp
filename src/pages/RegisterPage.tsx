@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth, type UserRole } from '../context/AuthContext'
 import AuthLayout from '../components/AuthLayout'
-import Grainient from '../components/Grainient'
+import Navbar from '../components/Navbar'
+import HeroBackground from '../components/HeroBackground'
 
 export default function RegisterPage() {
     const { signUp } = useAuth()
@@ -38,33 +39,13 @@ export default function RegisterPage() {
     )
 
     return (
-        <div className="relative min-h-screen">
-            <div className="absolute inset-0">
-                <Grainient
-                    color1="#a6f9d9"
-                    color2="#2563eb"
-                    color3="#f1c9fe"
-                    timeSpeed={0.6}
-                    colorBalance={0.11}
-                    warpStrength={2.85}
-                    warpFrequency={0.6}
-                    warpSpeed={2}
-                    warpAmplitude={50}
-                    blendAngle={-80}
-                    blendSoftness={0.47}
-                    rotationAmount={1440}
-                    noiseScale={0.2}
-                    grainAmount={0}
-                    grainScale={3.8}
-                    grainAnimated
-                    contrast={1.5}
-                    gamma={1}
-                    saturation={1}
-                    centerX={0}
-                    centerY={0}
-                    zoom={0.75}
-                />
-            </div>
+        <HeroBackground className="relative min-h-screen">
+            <Navbar>
+                <Link to="/home" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
+                    style={{ background: 'linear-gradient(135deg, #e94560, #c23152)' }}>
+                    Home
+                </Link>
+            </Navbar>
             <div className="relative z-10">
                 <AuthLayout title="Create your account">
                     {error && <p className="error-msg">{error}</p>}
@@ -97,6 +78,6 @@ export default function RegisterPage() {
                     </p>
                 </AuthLayout>
             </div>
-        </div>
+        </HeroBackground>
     )
 }

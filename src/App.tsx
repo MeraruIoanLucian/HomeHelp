@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import HomePage from './pages/HomePage'
 import Profile from './pages/Profile'
+import CreateJobPage from './pages/CreateJob'
 import NotFoundPage from './pages/NotFoundPage'
 import './index.css'
 
@@ -22,6 +23,9 @@ export default function App() {
           } />
           <Route path="/profile" element={
             <ProtectedRoute><Profile /></ProtectedRoute>
+          } />
+          <Route path="/create-job" element={
+            <ProtectedRoute><CreateJobPage /></ProtectedRoute>
           } />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
