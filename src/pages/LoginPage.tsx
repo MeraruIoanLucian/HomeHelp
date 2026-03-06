@@ -20,15 +20,15 @@ export default function LoginPage() {
         const { error } = await signIn(email, password)
         setLoading(false)
         if (error) setError(error)
-        else navigate('/home')
+        else navigate('/dashboard')
     }
 
     return (
         <HeroBackground className="relative min-h-screen">
             <Navbar>
                 <Link to="/" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
-                    style={{ background: 'linear-gradient(135deg, #e94560, #c23152)' }}>
-                    Home
+                    style={{ background: '#C9B59C', color: '#2c2419' }}>
+                    Back
                 </Link>
             </Navbar>
             <div className="relative z-10">

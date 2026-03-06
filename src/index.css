@@ -5,46 +5,46 @@
    ============================== */
 
 @theme {
-  /* Brand Colors */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  /* Brand Colors — Warm Earthy Palette */
+  --color-primary-50: #F9F8F6;
+  --color-primary-100: #EFE9E3;
+  --color-primary-200: #D9CFC7;
+  --color-primary-300: #C9B59C;
+  --color-primary-400: #b8a088;
+  --color-primary-500: #a08b74;
+  --color-primary-600: #8a7560;
+  --color-primary-700: #6b5e50;
+  --color-primary-800: #4a3f35;
+  --color-primary-900: #2c2419;
 
-  --color-accent-50: #fdf4ff;
-  --color-accent-100: #fae8ff;
-  --color-accent-200: #f5d0fe;
-  --color-accent-300: #f0abfc;
-  --color-accent-400: #e879f9;
-  --color-accent-500: #d946ef;
-  --color-accent-600: #c026d3;
-  --color-accent-700: #a21caf;
+  --color-accent-50: #F9F8F6;
+  --color-accent-100: #EFE9E3;
+  --color-accent-200: #D9CFC7;
+  --color-accent-300: #C9B59C;
+  --color-accent-400: #b8a088;
+  --color-accent-500: #a08b74;
+  --color-accent-600: #8a7560;
+  --color-accent-700: #6b5e50;
 
   --color-success-500: #22c55e;
   --color-warning-500: #f59e0b;
   --color-danger-500: #ef4444;
 
   /* Surface Colors */
-  --color-surface-50: #f8fafc;
-  --color-surface-100: #f1f5f9;
-  --color-surface-200: #e2e8f0;
-  --color-surface-700: #334155;
-  --color-surface-800: #1e293b;
-  --color-surface-900: #0f172a;
-  --color-surface-950: #020617;
+  --color-surface-50: #F9F8F6;
+  --color-surface-100: #EFE9E3;
+  --color-surface-200: #D9CFC7;
+  --color-surface-700: #6b5e50;
+  --color-surface-800: #4a3f35;
+  --color-surface-900: #2c2419;
+  --color-surface-950: #1a1610;
 
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-card-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.06);
 
   /* Border Radius */
   --radius-card: 0.75rem;
@@ -67,11 +67,19 @@ body {
 /* Shared component styles */
 @layer components {
   .input {
-    @apply w-full px-4 py-2.5 rounded-lg border border-surface-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm;
+    @apply w-full px-4 py-2.5 rounded-lg border border-surface-200 focus:outline-none focus:ring-2 focus:ring-primary-300 text-sm;
+    background: var(--color-surface-50);
+    color: var(--color-surface-900);
   }
 
   .btn-primary {
-    @apply w-full py-2.5 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50;
+    @apply w-full py-2.5 font-semibold rounded-lg transition-colors disabled:opacity-50;
+    background: var(--color-primary-300);
+    color: var(--color-primary-900);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-primary-400);
   }
 
   .error-msg {

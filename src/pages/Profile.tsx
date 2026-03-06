@@ -55,18 +55,19 @@ export default function ProfilePage() {
     return (
         <HeroBackground className="relative min-h-screen">
             <Navbar>
-                <Link to="/home" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
-                    style={{ background: 'linear-gradient(135deg, #e94560, #c23152)' }}>
-                    Home
+                <Link to="/dashboard" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
+                    style={{ background: '#C9B59C', color: '#2c2419' }}>
+                    Dashboard
                 </Link>
-                <button onClick={handleSignOut} className="px-5 py-2 text-sm font-medium rounded-lg border border-white/20 hover:bg-white/10 transition-all duration-200">
+                <button onClick={handleSignOut} className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-95"
+                    style={{ border: '1px solid #D9CFC7', color: '#6b5e50' }}>
                     Logout
                 </button>
             </Navbar>
             <div className="relative z-10 pt-32 px-6 max-w-2xl mx-auto">
-                <div className="rounded-xl bg-white/30 backdrop-blur p-2 justify-center mb-6">
+                <div className="rounded-xl p-4 mb-6" style={{ background: '#EFE9E3', border: '1px solid #D9CFC7' }}>
                     <div className="flex justify-center">
-                        <h1 className="text-4xl font-bold text-[#fff]">Profile</h1>
+                        <h1 className="text-4xl font-bold" style={{ color: '#2c2419' }}>Profile</h1>
                     </div>
                 </div>
 
@@ -83,8 +84,8 @@ export default function ProfilePage() {
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div className="w-full h-full bg-white/30 backdrop-blur flex items-center justify-center">
-                                <span className="text-5xl text-white/80">
+                            <div className="w-full h-full flex items-center justify-center" style={{ background: '#D9CFC7' }}>
+                                <span className="text-5xl" style={{ color: '#6b5e50' }}>
                                     {profile?.full_name?.charAt(0)?.toUpperCase() || '?'}
                                 </span>
                             </div>
@@ -116,9 +117,9 @@ export default function ProfilePage() {
                 </div>
 
                 {profile && (
-                    <div className="bg-white/30 backdrop-blur rounded-xl shadow-sm p-6">
-                        <p className="text-2xl font-medium text-[#fff] text-center">{profile.full_name}</p>
-                        <p className="text-lg text-[#fff] mt-1 text-center">
+                    <div className="rounded-xl p-6" style={{ background: '#EFE9E3', border: '1px solid #D9CFC7' }}>
+                        <p className="text-2xl font-medium text-center" style={{ color: '#2c2419' }}>{profile.full_name}</p>
+                        <p className="text-lg mt-1 text-center" style={{ color: '#6b5e50' }}>
                             Role: <span className="font-medium capitalize">{profile.role === 'helped' ? '🏠 Homeowner' : '🔧 Technician'}</span>
                         </p>
                     </div>

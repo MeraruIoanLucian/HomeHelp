@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth, type UserRole } from '../context/AuthContext'
 import AuthLayout from '../components/AuthLayout'
 import Navbar from '../components/Navbar'
@@ -8,10 +8,14 @@ import HeroBackground from '../components/HeroBackground'
 export default function RegisterPage() {
     const { signUp } = useAuth()
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+    const roleFromUrl = searchParams.get('role') as UserRole | null
+    const preselected = roleFromUrl === 'helped' || roleFromUrl === 'helper'
+
     const [fullName, setFullName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [role, setRole] = useState<UserRole>('helped')
+    const [role, setRole] = useState<UserRole>(preselected ? roleFromUrl : 'helped')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
@@ -22,7 +26,7 @@ export default function RegisterPage() {
         const { error } = await signUp(email, password, fullName, role)
         setLoading(false)
         if (error) setError(error)
-        else navigate('/home')
+        else navigate('/dashboard')
     }
 
     const roleBtn = (value: UserRole, label: string) => (
@@ -41,9 +45,9 @@ export default function RegisterPage() {
     return (
         <HeroBackground className="relative min-h-screen">
             <Navbar>
-                <Link to="/home" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
-                    style={{ background: 'linear-gradient(135deg, #e94560, #c23152)' }}>
-                    Home
+                <Link to="/" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
+                    style={{ background: '#C9B59C', color: '#2c2419' }}>
+                    Back
                 </Link>
             </Navbar>
             <div className="relative z-10">
@@ -59,13 +63,15 @@ export default function RegisterPage() {
                     <input type="password" placeholder="Password (min 6 characters)" value={password}
                         onChange={e => setPassword(e.target.value)} required minLength={6} className="input" />
 
-                    <fieldset className="space-y-2">
-                        <legend className="text-sm font-medium text-surface-700">I am a...</legend>
-                        <div className="grid grid-cols-2 gap-3">
-                            {roleBtn('helped', '🏠 Homeowner')}
-                            {roleBtn('helper', '🔧 Technician')}
-                        </div>
-                    </fieldset>
+                    {!preselected && (
+                        <fieldset className="space-y-2">
+                            <legend className="text-sm font-medium text-surface-700">I am a...</legend>
+                            <div className="grid grid-cols-2 gap-3">
+                                {roleBtn('helped', '🏠 Homeowner')}
+                                {roleBtn('helper', '🔧 Technician')}
+                            </div>
+                        </fieldset>
+                    )}
 
                     <button type="submit" disabled={loading} className="btn-primary"
                         onClick={handleSubmit}>
