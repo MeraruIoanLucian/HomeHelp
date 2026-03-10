@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 interface NavbarProps {
     children?: ReactNode
@@ -7,9 +8,10 @@ interface NavbarProps {
 
 export default function Navbar({ children }: NavbarProps) {
     const navigate = useNavigate()
+    const { profile } = useAuth()
     return (
         <nav className="absolute top-0 left-0 right-0 flex items-center justify-between px-8 py-5 z-20">
-            <button className="text-2xl font-extrabold tracking-tight cursor-pointer" style={{ color: '#2c2419' }} onClick={() => navigate('/dashboard')}>
+            <button className="text-2xl font-extrabold tracking-tight cursor-pointer" style={{ color: '#2c2419' }} onClick={() => profile ? navigate('/dashboard') : navigate('/')}>
                 Home<span style={{ color: '#C9B59C' }}>Help</span>
             </button>
             <div className="flex gap-3">
