@@ -23,6 +23,9 @@ Thumbs.db
 CONVENTIONS.md
 HomeHelp_Final.md
 
+# Supabase CLI temp
+supabase/.temp/
+
 # Logs
 *.log
 npm-debug.log*
