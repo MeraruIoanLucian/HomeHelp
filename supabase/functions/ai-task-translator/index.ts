@@ -98,7 +98,9 @@ Deno.serve(async (req: Request) => {
         contents: [{ parts: [{ text: description.trim() }] }],
         generationConfig: {
           temperature: 0.1,
-          maxOutputTokens: 200,
+          maxOutputTokens: 500,
+          responseMimeType: "application/json",
+          thinkingConfig: { thinkingBudget: 0 },
         },
       }),
     });
@@ -110,23 +112,28 @@ Deno.serve(async (req: Request) => {
     }
 
     const geminiData = await geminiResponse.json();
-    console.log("Gemini raw response:", JSON.stringify(geminiData));
 
     // ─── 5. Extract and parse AI text ───────────────────────────────────
     const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-    // Clean markdown code fences if present
-    const cleanText = rawText
-      .replace(/```json\s*/gi, "")
-      .replace(/```\s*/g, "")
-      .trim();
-
     let parsed;
     try {
-      parsed = JSON.parse(cleanText);
+      // First try direct parse (should work with responseMimeType)
+      parsed = JSON.parse(rawText.trim());
     } catch {
-      console.error("Failed to parse Gemini output:", rawText);
-      return jsonResponse({ error: "AI returned invalid format. Try again." }, 200);
+      // Fallback: try to find JSON object anywhere in the text
+      const jsonMatch = rawText.match(/\{[\s\S]*?"category"[\s\S]*?"title"[\s\S]*?"urgency"[\s\S]*?\}/);
+      if (jsonMatch) {
+        try {
+          parsed = JSON.parse(jsonMatch[0]);
+        } catch {
+          console.error("Failed to parse Gemini output:", rawText);
+          return jsonResponse({ error: "AI returned invalid format. Try again." }, 200);
+        }
+      } else {
+        console.error("No JSON found in Gemini output:", rawText);
+        return jsonResponse({ error: "AI returned invalid format. Try again." }, 200);
+      }
     }
 
     // ─── 6. Validate and sanitize ───────────────────────────────────────
