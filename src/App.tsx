@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import CreateJobPage from './pages/CreateJob'
 import NotFoundPage from './pages/NotFoundPage'
+import HelpedJobs from './pages/HelpedJobs'
 import './index.css'
 
 export default function App() {
@@ -26,6 +27,9 @@ export default function App() {
           } />
           <Route path="/create-job" element={
             <ProtectedRoute><CreateJobPage /></ProtectedRoute>
+          } />
+          <Route path="/helped-jobs" element={
+            <ProtectedRoute><HelpedJobs /></ProtectedRoute>
           } />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

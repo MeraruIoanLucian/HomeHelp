@@ -27,7 +27,7 @@ interface AiResult {
 }
 
 export default function CreateJobPage() {
-    const { profile } = useAuth()
+    const { profile, user } = useAuth()
     const navigate = useNavigate()
 
     // ── AI state ─────────────────────────────────────────────────────────
@@ -42,6 +42,8 @@ export default function CreateJobPage() {
     const [category, setCategory] = useState('')
     const [urgency, setUrgency] = useState('')
     const [price, setPrice] = useState('')
+    const [submitting, setSubmitting] = useState(false)
+    const [submitError, setSubmitError] = useState<string | null>(null)
 
     // Redirect helpers away
     if (profile?.role === 'helper') {
@@ -101,6 +103,58 @@ export default function CreateJobPage() {
             setAiError(message)
         } finally {
             setAiLoading(false)
+        }
+    }
+
+    // ── Submit job to Supabase ───────────────────────────────────────────
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault()
+        setSubmitError(null)
+
+        // Validation
+        if (!category) {
+            setSubmitError('Please select a category.')
+            return
+        }
+        if (!title.trim()) {
+            setSubmitError('Please enter a job title.')
+            return
+        }
+        if (!description.trim()) {
+            setSubmitError('Please enter a description.')
+            return
+        }
+        if (!urgency) {
+            setSubmitError('Please select an urgency level.')
+            return
+        }
+        if (!user) {
+            setSubmitError('You must be logged in.')
+            return
+        }
+
+        setSubmitting(true)
+
+        try {
+            const { error } = await supabase.from('jobs').insert({
+                owner_id: user.id,
+                title: title.trim(),
+                description: description.trim(),
+                category,
+                urgency,
+                budget: price.trim() || null,
+                ai_generated: aiUsed,
+            })
+
+            if (error) throw new Error(error.message)
+
+            navigate('/dashboard')
+        } catch (err: unknown) {
+            const message =
+                err instanceof Error ? err.message : 'Failed to create job.'
+            setSubmitError(message)
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -250,7 +304,7 @@ export default function CreateJobPage() {
                             border: '1px solid #D9CFC7',
                         }}
                     >
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={handleSubmit}>
                             {/* Category */}
                             <div>
                                 <label
@@ -385,15 +439,30 @@ export default function CreateJobPage() {
                                 />
                             </div>
 
+                            {/* Submit Error */}
+                            {submitError && (
+                                <div
+                                    className="p-3 rounded-lg text-sm"
+                                    style={{
+                                        background: '#FEE2E2',
+                                        color: '#991B1B',
+                                        border: '1px solid #FECACA',
+                                    }}
+                                >
+                                    {submitError}
+                                </div>
+                            )}
+
                             <button
                                 type="submit"
-                                className="w-full py-3 text-sm font-semibold rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
+                                disabled={submitting}
+                                className="w-full py-3 text-sm font-semibold rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{
-                                    background: '#C9B59C',
+                                    background: submitting ? '#A89882' : '#C9B59C',
                                     color: '#2c2419',
                                 }}
                             >
-                                Create Job
+                                {submitting ? 'Creating…' : 'Create Job'}
                             </button>
                         </form>
                     </div>

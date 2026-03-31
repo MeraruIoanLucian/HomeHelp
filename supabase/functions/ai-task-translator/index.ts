@@ -87,7 +87,7 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: "Please provide a description (min 5 chars)." }, 400);
     }
 
-    // ─── 4. Call Gemini 1.5 Flash ───────────────────────────────────────
+    // ─── 4. Call Gemini 2.5 Flash ───────────────────────────────────────
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
 
     const geminiResponse = await fetch(geminiUrl, {

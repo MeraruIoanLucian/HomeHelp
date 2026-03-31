@@ -22,13 +22,7 @@ export default function Dashboard() {
                     className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
                     style={{ background: '#C9B59C', color: '#2c2419' }}
                 >
-                    💬 Chat
-                </Link>
-                <Link to="/appointments"
-                    className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
-                    style={{ background: '#C9B59C', color: '#2c2419' }}
-                >
-                    🗓️ Appointments
+                    💬 Chats
                 </Link>
                 <Link to="/profile"
                     className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
@@ -58,14 +52,14 @@ export default function Dashboard() {
                                 <p className="text-sm sm:text-base leading-relaxed" style={{ color: '#6b5e50' }}>Describe your problem and we'll match you with the right helper.</p>
                             </div>
                         </Link>
-                        <Link to="/jobs" className="rounded-2xl overflow-hidden block" style={{ background: '#EFE9E3', border: '1px solid #D9CFC7' }}>
+                        <Link to="/helped-jobs" className="rounded-2xl overflow-hidden block" style={{ background: '#EFE9E3', border: '1px solid #D9CFC7' }}>
                             <div className="flex items-center justify-center h-110" style={{ background: '#D9CFC7' }}>
                                 <img src={Homeowner} alt="Create Job" className="w-full h-full" />
                             </div>
                             <div className="p-8">
                                 <div className="w-10 h-1 rounded-full mb-4" style={{ background: '#C9B59C' }} />
-                                <h3 className="text-xl sm:text-2xl font-bold mb-2" style={{ color: '#2c2419' }}>See Current Jobs</h3>
-                                <p className="text-sm sm:text-base leading-relaxed" style={{ color: '#6b5e50' }}>Track your active requests and manage ongoing tasks.</p>
+                                <h3 className="text-xl sm:text-2xl font-bold mb-2" style={{ color: '#2c2419' }}>See Your Jobs</h3>
+                                <p className="text-sm sm:text-base leading-relaxed" style={{ color: '#6b5e50' }}>Track and manage your jobs.</p>
                             </div>
                         </Link>
                     </div>
