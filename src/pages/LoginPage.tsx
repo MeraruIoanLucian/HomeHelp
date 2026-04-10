@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import AuthLayout from '../components/AuthLayout'
-import Navbar from '../components/Navbar'
-import HeroBackground from '../components/HeroBackground'
+import AlertMessage from '../components/AlertMessage'
+import GradientButton from '../components/GradientButton'
 
 export default function LoginPage() {
     const { signIn } = useAuth()
@@ -13,8 +13,7 @@ export default function LoginPage() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
+    async function handleSubmit() {
         setError('')
         setLoading(true)
         const { error } = await signIn(email, password)
@@ -24,35 +23,51 @@ export default function LoginPage() {
     }
 
     return (
-        <HeroBackground className="relative min-h-screen">
-            <Navbar>
-                <Link to="/" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
-                    style={{ background: '#C9B59C', color: '#2c2419' }}>
-                    Back
-                </Link>
-            </Navbar>
-            <div className="relative z-10">
-                <AuthLayout title="Welcome back">
+        <AuthLayout title="Welcome back">
+            {error && <AlertMessage type="error" message={error} />}
 
-                    {error && <p className="error-msg">{error}</p>}
-
-                    <input type="email" placeholder="Email" value={email}
-                        onChange={e => setEmail(e.target.value)} required className="input" />
-
-                    <input type="password" placeholder="Password" value={password}
-                        onChange={e => setPassword(e.target.value)} required className="input" />
-
-                    <button type="submit" disabled={loading} className="btn-primary"
-                        onClick={handleSubmit}>
-                        {loading ? 'Signing in...' : 'Sign In'}
-                    </button>
-
-                    <p className="text-sm text-surface-700 text-center">
-                        Don't have an account?{' '}
-                        <Link to="/register" className="text-primary-600 hover:underline">Sign up</Link>
-                    </p>
-                </AuthLayout>
+            <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#6b5e50' }}>Email</label>
+                <input
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all text-sm"
+                    style={{ background: '#F9F8F6', border: '1px solid #D9CFC7', color: '#2c2419' }}
+                />
             </div>
-        </HeroBackground>
+
+            <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#6b5e50' }}>Password</label>
+                <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all text-sm"
+                    style={{ background: '#F9F8F6', border: '1px solid #D9CFC7', color: '#2c2419' }}
+                />
+            </div>
+
+            <GradientButton
+                onClick={handleSubmit}
+                loading={loading}
+                disabled={loading}
+                fullWidth
+                size="sm"
+            >
+                Sign In
+            </GradientButton>
+
+            <p className="text-sm text-center" style={{ color: '#6b5e50' }}>
+                Don't have an account?{' '}
+                <Link to="/register" className="font-semibold transition-colors duration-200" style={{ color: '#2c2419' }}>
+                    Sign up
+                </Link>
+            </p>
+        </AuthLayout>
     )
 }

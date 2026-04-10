@@ -2,9 +2,8 @@ import { useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Link } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import HeroBackground from '../components/HeroBackground'
+import SectionHeading from '../components/SectionHeading'
+import GradientButton from '../components/GradientButton'
 
 export default function ProfilePage() {
     const { profile, user, signOut, refreshProfile } = useAuth()
@@ -20,29 +19,20 @@ export default function ProfilePage() {
     async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0]
         if (!file || !user) return
-
         setUploading(true)
         try {
             const fileExt = file.name.split('.').pop()
             const filePath = `${user.id}/avatar.${fileExt}`
-
             const { error: uploadError } = await supabase.storage
                 .from('avatars')
                 .upload(filePath, file, { upsert: true })
-
             if (uploadError) throw uploadError
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(filePath)
-
+            const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath)
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({ avatar_url: publicUrl })
                 .eq('id', user.id)
-
             if (updateError) throw updateError
-
             await refreshProfile()
         } catch (err) {
             console.error('Avatar upload failed:', err)
@@ -52,79 +42,148 @@ export default function ProfilePage() {
         }
     }
 
+    const initials = profile?.full_name
+        ?.split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+
     return (
-        <HeroBackground className="relative min-h-screen">
-            <Navbar>
-                <Link to="/dashboard" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
-                    style={{ background: '#C9B59C', color: '#2c2419' }}>
-                    Dashboard
-                </Link>
-                <button onClick={handleSignOut} className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-95"
-                    style={{ border: '1px solid #D9CFC7', color: '#6b5e50' }}>
-                    Logout
-                </button>
-            </Navbar>
-            <div className="relative z-10 pt-32 px-6 max-w-2xl mx-auto">
-                <div className="rounded-xl p-4 mb-6" style={{ background: '#EFE9E3', border: '1px solid #D9CFC7' }}>
-                    <div className="flex justify-center">
-                        <h1 className="text-4xl font-bold" style={{ color: '#2c2419' }}>Profile</h1>
-                    </div>
-                </div>
+        <div style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <main className="pt-12 pb-24 px-6 md:px-12 max-w-4xl mx-auto">
+                {/* Profile Header Card */}
+                <div
+                    className="rounded-[2rem] p-8 md:p-12 mb-8 relative overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg, #2c2419, #4a3f35)' }}
+                >
+                    <div className="absolute -top-32 -right-32 w-80 h-80 rounded-full blur-3xl" style={{ background: 'rgba(201, 181, 156, 0.15)' }} />
 
-                {/* Avatar upload circle */}
-                <div className="flex flex-col items-center mb-6">
-                    <div
-                        className="relative w-32 h-32 rounded-full overflow-hidden cursor-pointer group"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        {profile?.avatar_url ? (
-                            <img
-                                src={profile.avatar_url}
-                                alt="Profile"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center" style={{ background: '#D9CFC7' }}>
-                                <span className="text-5xl" style={{ color: '#6b5e50' }}>
-                                    {profile?.full_name?.charAt(0)?.toUpperCase() || '?'}
-                                </span>
-                            </div>
-                        )}
-
-                        {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            {uploading ? (
-                                <svg className="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                </svg>
+                    <div className="relative z-10 flex flex-col items-center text-center">
+                        {/* Avatar */}
+                        <div
+                            className="relative w-28 h-28 md:w-36 md:h-36 rounded-3xl overflow-hidden cursor-pointer group mb-6"
+                            onClick={() => fileInputRef.current?.click()}
+                            style={{ border: '4px solid rgba(201, 181, 156, 0.3)' }}
+                        >
+                            {profile?.avatar_url ? (
+                                <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+                                <div className="w-full h-full flex items-center justify-center" style={{ background: '#C9B59C30' }}>
+                                    <span className="text-4xl font-bold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#C9B59C' }}>
+                                        {initials || '?'}
+                                    </span>
+                                </div>
                             )}
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                {uploading ? (
+                                    <span className="material-symbols-outlined text-white animate-spin">progress_activity</span>
+                                ) : (
+                                    <span className="material-symbols-outlined text-white">photo_camera</span>
+                                )}
+                            </div>
+                            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
                         </div>
 
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleAvatarUpload}
+                        <SectionHeading
+                            title={profile?.full_name ?? 'User'}
+                            light
+                            centered
+                            size="sm"
                         />
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className="material-symbols-outlined text-sm" style={{ color: '#C9B59C', fontVariationSettings: "'FILL' 1" }}>
+                                {profile?.role === 'helper' ? 'engineering' : 'home'}
+                            </span>
+                            <span className="text-sm font-semibold" style={{ color: '#C9B59C' }}>
+                                {profile?.role === 'helper' ? 'Technician' : 'Homeowner'}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                {profile && (
-                    <div className="rounded-xl p-6" style={{ background: '#EFE9E3', border: '1px solid #D9CFC7' }}>
-                        <p className="text-2xl font-medium text-center" style={{ color: '#2c2419' }}>{profile.full_name}</p>
-                        <p className="text-lg mt-1 text-center" style={{ color: '#6b5e50' }}>
-                            Role: <span className="font-medium capitalize">{profile.role === 'helped' ? '🏠 Homeowner' : '🔧 Technician'}</span>
-                        </p>
+                {/* Info Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Personal Information */}
+                    <div className="rounded-[2rem] p-8" style={{ background: '#FFFFFF', boxShadow: '0 24px 48px rgba(44,36,25,0.04)' }}>
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-2 rounded-xl" style={{ background: '#C9B59C20' }}>
+                                <span className="material-symbols-outlined" style={{ color: '#C9B59C' }}>badge</span>
+                            </div>
+                            <h2 className="text-xl font-bold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>Personal Info</h2>
+                        </div>
+                        <div className="space-y-5">
+                            {[
+                                { label: 'Full Name', value: profile?.full_name, icon: 'person' },
+                                { label: 'Email', value: user?.email, icon: 'mail' },
+                                { label: 'Phone', value: profile?.phone || 'Not set', icon: 'phone' },
+                                { label: 'City', value: profile?.city || 'Not set', icon: 'location_on' },
+                            ].map((field, i) => (
+                                <div key={i} className="flex items-center gap-4">
+                                    <span className="material-symbols-outlined text-lg" style={{ color: '#D9CFC7' }}>{field.icon}</span>
+                                    <div>
+                                        <div className="text-[10px] font-bold tracking-widest uppercase" style={{ color: '#6b5e50' }}>{field.label}</div>
+                                        <div className="text-sm font-medium" style={{ color: '#2c2419' }}>{field.value ?? '—'}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                )}
-            </div>
-        </HeroBackground>
+
+                    {/* Stats Card */}
+                    <div className="rounded-[2rem] p-8" style={{ background: '#FFFFFF', boxShadow: '0 24px 48px rgba(44,36,25,0.04)' }}>
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-2 rounded-xl" style={{ background: '#C9B59C20' }}>
+                                <span className="material-symbols-outlined" style={{ color: '#C9B59C' }}>insights</span>
+                            </div>
+                            <h2 className="text-xl font-bold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>Stats & Reputation</h2>
+                        </div>
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: '#FEF3C7' }}>
+                                    <span className="material-symbols-outlined text-2xl" style={{ color: '#F59E0B', fontVariationSettings: "'FILL' 1" }}>star</span>
+                                </div>
+                                <div>
+                                    <div className="text-3xl font-black" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>
+                                        {profile?.rating_avg?.toFixed(1) ?? '0.0'}
+                                    </div>
+                                    <div className="text-xs" style={{ color: '#6b5e50' }}>{profile?.rating_count ?? 0} reviews</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: '#6b5e50' }}>Bio</div>
+                                <p className="text-sm leading-relaxed" style={{ color: profile?.bio ? '#2c2419' : '#A89882' }}>
+                                    {profile?.bio ?? 'No bio added yet.'}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: '#F9F8F6' }}>
+                                <span className="material-symbols-outlined text-sm" style={{ color: '#C9B59C' }}>calendar_today</span>
+                                <span className="text-sm" style={{ color: '#6b5e50' }}>
+                                    Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="rounded-[2rem] p-8 mt-6 flex flex-col sm:flex-row justify-between items-center gap-6" style={{ background: '#EFE9E3' }}>
+                    <div>
+                        <h3 className="font-bold text-lg mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>Quick Actions</h3>
+                        <p className="text-sm" style={{ color: '#6b5e50' }}>Jump to your most-used features.</p>
+                    </div>
+                    <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                        <GradientButton to="/dashboard" variant="outline" icon="dashboard" size="sm">Dashboard</GradientButton>
+                        <GradientButton to="/helped-jobs" icon="pending_actions" size="sm">My Jobs</GradientButton>
+                        <button onClick={handleSignOut}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer"
+                            style={{ border: '1px solid #D9CFC7', color: '#6b5e50' }}>
+                            <span className="material-symbols-outlined text-sm">logout</span>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
     )
 }

@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth, type UserRole } from '../context/AuthContext'
 import AuthLayout from '../components/AuthLayout'
-import Navbar from '../components/Navbar'
-import HeroBackground from '../components/HeroBackground'
+import AlertMessage from '../components/AlertMessage'
+import GradientButton from '../components/GradientButton'
 
 export default function RegisterPage() {
     const { signUp } = useAuth()
@@ -19,8 +19,7 @@ export default function RegisterPage() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
+    async function handleSubmit() {
         setError('')
         setLoading(true)
         const { error } = await signUp(email, password, fullName, role)
@@ -29,61 +28,74 @@ export default function RegisterPage() {
         else navigate('/dashboard')
     }
 
-    const roleBtn = (value: UserRole, label: string) => (
-        <button
-            type="button"
-            onClick={() => setRole(value)}
-            className={`py-3 rounded-lg border text-sm font-medium transition-colors ${role === value
-                ? 'border-primary-500 bg-primary-50 text-primary-700'
-                : 'border-surface-200 text-surface-700 hover:border-surface-300'
-                }`}
-        >
-            {label}
-        </button>
-    )
-
     return (
-        <HeroBackground className="relative min-h-screen">
-            <Navbar>
-                <Link to="/" className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
-                    style={{ background: '#C9B59C', color: '#2c2419' }}>
-                    Back
-                </Link>
-            </Navbar>
-            <div className="relative z-10">
-                <AuthLayout title="Create your account">
-                    {error && <p className="error-msg">{error}</p>}
+        <AuthLayout title="Create your account">
+            {error && <AlertMessage type="error" message={error} />}
 
-                    <input type="text" placeholder="Full name" value={fullName}
-                        onChange={e => setFullName(e.target.value)} required className="input" />
-
-                    <input type="email" placeholder="Email" value={email}
-                        onChange={e => setEmail(e.target.value)} required className="input" />
-
-                    <input type="password" placeholder="Password (min 6 characters)" value={password}
-                        onChange={e => setPassword(e.target.value)} required minLength={6} className="input" />
-
-                    {!preselected && (
-                        <fieldset className="space-y-2">
-                            <legend className="text-sm font-medium text-surface-700">I am a...</legend>
-                            <div className="grid grid-cols-2 gap-3">
-                                {roleBtn('helped', '🏠 Homeowner')}
-                                {roleBtn('helper', '🔧 Technician')}
-                            </div>
-                        </fieldset>
-                    )}
-
-                    <button type="submit" disabled={loading} className="btn-primary"
-                        onClick={handleSubmit}>
-                        {loading ? 'Creating account...' : 'Sign Up'}
-                    </button>
-
-                    <p className="text-sm text-surface-700 text-center">
-                        Already have an account?{' '}
-                        <Link to="/login" className="text-primary-600 hover:underline">Sign in</Link>
-                    </p>
-                </AuthLayout>
+            <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#6b5e50' }}>Full name</label>
+                <input type="text" placeholder="John Doe" value={fullName}
+                    onChange={e => setFullName(e.target.value)} required
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all text-sm"
+                    style={{ background: '#F9F8F6', border: '1px solid #D9CFC7', color: '#2c2419' }} />
             </div>
-        </HeroBackground>
+
+            <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#6b5e50' }}>Email</label>
+                <input type="email" placeholder="name@example.com" value={email}
+                    onChange={e => setEmail(e.target.value)} required
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all text-sm"
+                    style={{ background: '#F9F8F6', border: '1px solid #D9CFC7', color: '#2c2419' }} />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#6b5e50' }}>Password</label>
+                <input type="password" placeholder="Min 6 characters" value={password}
+                    onChange={e => setPassword(e.target.value)} required minLength={6}
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all text-sm"
+                    style={{ background: '#F9F8F6', border: '1px solid #D9CFC7', color: '#2c2419' }} />
+            </div>
+
+            {/* Role Selector */}
+            {!preselected && (
+                <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: '#6b5e50' }}>I am a…</label>
+                    <div className="grid grid-cols-2 gap-3">
+                        {([
+                            { value: 'helped' as UserRole, icon: 'home', label: 'Homeowner' },
+                            { value: 'helper' as UserRole, icon: 'engineering', label: 'Technician' },
+                        ]).map((opt) => (
+                            <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() => setRole(opt.value)}
+                                className="flex flex-col items-center p-4 rounded-2xl transition-all duration-200 cursor-pointer"
+                                style={{
+                                    background: role === opt.value ? '#FFFFFF' : '#F9F8F6',
+                                    border: `2px solid ${role === opt.value ? '#2c2419' : '#D9CFC7'}`,
+                                }}
+                            >
+                                <span className="material-symbols-outlined mb-2 text-2xl" style={{
+                                    color: role === opt.value ? '#2c2419' : '#6b5e50',
+                                    fontVariationSettings: role === opt.value ? "'FILL' 1" : "'FILL' 0",
+                                }}>{opt.icon}</span>
+                                <span className="text-sm font-semibold" style={{ color: role === opt.value ? '#2c2419' : '#6b5e50' }}>
+                                    {opt.label}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <GradientButton onClick={handleSubmit} loading={loading} disabled={loading} fullWidth size="sm">
+                Sign Up
+            </GradientButton>
+
+            <p className="text-sm text-center" style={{ color: '#6b5e50' }}>
+                Already have an account?{' '}
+                <Link to="/login" className="font-semibold transition-colors duration-200" style={{ color: '#2c2419' }}>Sign in</Link>
+            </p>
+        </AuthLayout>
     )
 }

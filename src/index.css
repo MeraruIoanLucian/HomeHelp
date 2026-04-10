@@ -4,6 +4,20 @@
    HomeHelp — Design System
    ============================== */
 
+/* Variabile CSS principale - le folosim in inline styles cu var() */
+:root {
+  --brand-dark: #2c2419;
+  --brand-accent: #C9B59C;
+  --brand-muted: #6b5e50;
+  --brand-light: #EFE9E3;
+  --brand-bg: #F9F8F6;
+  --brand-border: #D9CFC7;
+  --brand-dark-secondary: #4a3f35;
+
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+}
+
 @theme {
   /* Brand Colors — Warm Earthy Palette */
   --color-primary-50: #F9F8F6;
@@ -41,10 +55,12 @@
 
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-headline: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
 
   /* Shadows */
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
   --shadow-card-hover: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.06);
+  --shadow-editorial: 0 24px 48px rgba(25, 28, 29, 0.06);
 
   /* Border Radius */
   --radius-card: 0.75rem;
@@ -52,11 +68,17 @@
   --radius-input: 0.5rem;
 }
 
+/* Material Symbols base */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
 /* Base styles */
 body {
-  font-family: var(--font-sans);
-  background-color: var(--color-surface-50);
-  color: var(--color-surface-900);
+  font-family: var(--font-body);
+  background-color: var(--brand-bg);
+  color: var(--brand-dark);
   min-height: 100vh;
 }
 
@@ -64,18 +86,26 @@ body {
   min-height: 100vh;
 }
 
-/* Shared component styles */
+/* Glassmorphic background - folosit pe navbaruri */
+.glass-bg {
+  background: rgba(249, 248, 246, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 24px 48px rgba(44, 36, 25, 0.04);
+}
+
+/* Input & button styles */
 @layer components {
   .input {
     @apply w-full px-4 py-2.5 rounded-lg border border-surface-200 focus:outline-none focus:ring-2 focus:ring-primary-300 text-sm;
-    background: var(--color-surface-50);
-    color: var(--color-surface-900);
+    background: var(--brand-bg);
+    color: var(--brand-dark);
   }
 
   .btn-primary {
     @apply w-full py-2.5 font-semibold rounded-lg transition-colors disabled:opacity-50;
-    background: var(--color-primary-300);
-    color: var(--color-primary-900);
+    background: var(--brand-accent);
+    color: var(--brand-dark);
   }
 
   .btn-primary:hover {

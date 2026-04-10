@@ -1,42 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import Navbar from '../components/Navbar'
-import HeroBackground from '../components/HeroBackground'
-
-const CATEGORIES = [
-    'Instalații Apă',
-    'Gaze',
-    'Electrice',
-    'Centrale Termice',
-    'Climatizare',
-    'Altele',
-] as const
+import SectionHeading from '../components/SectionHeading'
+import GradientButton from '../components/GradientButton'
+import AlertMessage from '../components/AlertMessage'
+import { CATEGORIES } from '../components/CategoryIcon'
 
 const URGENCIES = [
-    { value: 'low', label: '🟢 Low' },
-    { value: 'medium', label: '🟡 Medium' },
-    { value: 'urgent', label: '🔴 Urgent' },
+    { value: 'low', label: 'Low', icon: 'check_circle', color: '#065F46', bg: '#D1FAE5' },
+    { value: 'medium', label: 'Medium', icon: 'warning', color: '#92400E', bg: '#FEF3C7' },
+    { value: 'urgent', label: 'Urgent', icon: 'priority_high', color: '#991B1B', bg: '#FEE2E2' },
 ] as const
 
-interface AiResult {
-    category: string
-    title: string
-    urgency: 'low' | 'medium' | 'urgent'
-}
+interface AiResult { category: string; title: string; urgency: 'low' | 'medium' | 'urgent' }
 
 export default function CreateJobPage() {
     const { profile, user } = useAuth()
     const navigate = useNavigate()
 
-    // ── AI state ─────────────────────────────────────────────────────────
     const [aiDescription, setAiDescription] = useState('')
     const [aiLoading, setAiLoading] = useState(false)
     const [aiError, setAiError] = useState<string | null>(null)
     const [aiUsed, setAiUsed] = useState(false)
 
-    // ── Form state ───────────────────────────────────────────────────────
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [category, setCategory] = useState('')
@@ -45,432 +32,172 @@ export default function CreateJobPage() {
     const [submitting, setSubmitting] = useState(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
 
-    // Redirect helpers away
-    if (profile?.role === 'helper') {
-        navigate('/dashboard')
-        return null
-    }
+    useEffect(() => { if (profile?.role === 'helper') navigate('/dashboard') }, [profile])
 
-    // ── Call AI Edge Function ────────────────────────────────────────────
     async function handleAiAnalyze() {
         if (!aiDescription.trim() || aiDescription.trim().length < 5) {
             setAiError('Scrie cel puțin 5 caractere pentru a descrie problema.')
             return
         }
-
-        setAiLoading(true)
-        setAiError(null)
-
+        setAiLoading(true); setAiError(null)
         try {
-            const { data, error } = await supabase.functions.invoke(
-                'ai-task-translator',
-                {
-                    body: { description: aiDescription.trim() },
-                }
-            )
-
+            const { data, error } = await supabase.functions.invoke('ai-task-translator', { body: { description: aiDescription.trim() } })
             if (error) {
-                // Try to read the actual error message from the response
                 let errorMsg = 'Failed to call AI function.'
                 try {
-                    if (error.context instanceof Response) {
-                        const errBody = await error.context.json()
-                        errorMsg = errBody?.error || error.message || errorMsg
-                    } else {
-                        errorMsg = error.message || errorMsg
-                    }
-                } catch {
-                    errorMsg = error.message || errorMsg
-                }
+                    if (error.context instanceof Response) { const errBody = await error.context.json(); errorMsg = errBody?.error || error.message || errorMsg }
+                    else { errorMsg = error.message || errorMsg }
+                } catch { errorMsg = error.message || errorMsg }
                 throw new Error(errorMsg)
             }
-
-            if (data?.error) {
-                throw new Error(data.error)
-            }
-
+            if (data?.error) throw new Error(data.error)
             const result = data as AiResult
-
-            // Auto-fill the form
-            setCategory(result.category)
-            setTitle(result.title)
-            setUrgency(result.urgency)
-            setDescription(aiDescription.trim())
-            setAiUsed(true)
+            setCategory(result.category); setTitle(result.title); setUrgency(result.urgency); setDescription(aiDescription.trim()); setAiUsed(true)
         } catch (err: unknown) {
-            const message =
-                err instanceof Error ? err.message : 'Something went wrong.'
-            setAiError(message)
-        } finally {
-            setAiLoading(false)
-        }
+            setAiError(err instanceof Error ? err.message : 'Something went wrong.')
+        } finally { setAiLoading(false) }
     }
 
-    // ── Submit job to Supabase ───────────────────────────────────────────
     async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        setSubmitError(null)
-
-        // Validation
-        if (!category) {
-            setSubmitError('Please select a category.')
-            return
-        }
-        if (!title.trim()) {
-            setSubmitError('Please enter a job title.')
-            return
-        }
-        if (!description.trim()) {
-            setSubmitError('Please enter a description.')
-            return
-        }
-        if (!urgency) {
-            setSubmitError('Please select an urgency level.')
-            return
-        }
-        if (!user) {
-            setSubmitError('You must be logged in.')
-            return
-        }
-
+        e.preventDefault(); setSubmitError(null)
+        if (!category) { setSubmitError('Please select a category.'); return }
+        if (!title.trim()) { setSubmitError('Please enter a job title.'); return }
+        if (!description.trim()) { setSubmitError('Please enter a description.'); return }
+        if (!urgency) { setSubmitError('Please select an urgency level.'); return }
+        if (!user) { setSubmitError('You must be logged in.'); return }
         setSubmitting(true)
-
         try {
             const { error } = await supabase.from('jobs').insert({
-                owner_id: user.id,
-                title: title.trim(),
-                description: description.trim(),
-                category,
-                urgency,
-                budget: price.trim() || null,
-                ai_generated: aiUsed,
+                owner_id: user.id, title: title.trim(), description: description.trim(),
+                category, urgency, budget: price.trim() || null, ai_generated: aiUsed,
             })
-
             if (error) throw new Error(error.message)
-
             navigate('/dashboard')
         } catch (err: unknown) {
-            const message =
-                err instanceof Error ? err.message : 'Failed to create job.'
-            setSubmitError(message)
-        } finally {
-            setSubmitting(false)
-        }
+            setSubmitError(err instanceof Error ? err.message : 'Failed to create job.')
+        } finally { setSubmitting(false) }
     }
 
     return (
-        <div className="relative z-10 min-h-screen">
-            <Navbar>
-                <Link
-                    to="/dashboard"
-                    className="px-5 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer"
-                    style={{ background: '#C9B59C', color: '#2c2419' }}
-                >
-                    Dashboard
-                </Link>
-            </Navbar>
-            <HeroBackground className="relative min-h-screen">
-                <div className="pt-32 px-6 max-w-2xl mx-auto pb-12">
-                    {/* Header */}
-                    <div
-                        className="rounded-xl p-4 mb-6"
-                        style={{
-                            background: '#EFE9E3',
-                            border: '1px solid #D9CFC7',
-                        }}
-                    >
-                        <h1
-                            className="text-4xl font-bold text-center"
-                            style={{ color: '#2c2419' }}
-                        >
-                            Create a Job
-                        </h1>
-                    </div>
+        <div style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <main className="pt-12 pb-24 px-6 md:px-12 max-w-screen-2xl mx-auto">
+                <div className="mb-12">
+                    <SectionHeading
+                        title="Create a New Job"
+                        subtitle="Connect with the best professionals for your home projects. Use our AI assistant to streamline your request."
+                    />
+                </div>
 
-                    {/* ── AI Section ───────────────────────────────────── */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        <div
-                            className="rounded-xl p-6 mb-6"
-                            style={{
-                                background: 'linear-gradient(135deg, #EFE9E3 0%, #E8E0D8 100%)',
-                                border: '1px solid #C9B59C',
-                            }}
-                        >
-                            <div className="flex items-center gap-2 mb-3">
-                                <h2
-                                    className="text-lg font-semibold"
-                                    style={{ color: '#2c2419' }}
-                                >
-                                    Describe your problem
-                                </h2>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                    {/* Left: AI Assistant */}
+                    <aside className="lg:col-span-5 lg:sticky lg:top-32">
+                        <div className="p-8 rounded-[2rem] relative overflow-hidden group" style={{ background: 'linear-gradient(135deg, #2c2419, #4a3f35)' }}>
+                            <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl transition-all duration-500 group-hover:opacity-40" style={{ background: 'rgba(201, 181, 156, 0.2)' }} />
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 rounded-lg" style={{ background: 'rgba(201, 181, 156, 0.15)' }}>
+                                        <span className="material-symbols-outlined" style={{ color: '#C9B59C', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                                    </div>
+                                    <h2 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#FFFFFF' }}>
+                                        Describe your problem.
+                                    </h2>
+                                </div>
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2" style={{ color: '#D9CFC7' }}>Detailed Description</label>
+                                        <textarea value={aiDescription} onChange={(e) => setAiDescription(e.target.value)}
+                                            placeholder='e.g. "mi s-a spart o țeavă în baie și curge apa peste tot"'
+                                            className="w-full rounded-2xl p-4 min-h-[180px] text-base leading-relaxed resize-none outline-none transition-all"
+                                            style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#FFFFFF' }} />
+                                    </div>
+                                    <button type="button" onClick={handleAiAnalyze} disabled={aiLoading || !aiDescription.trim()}
+                                        className="w-full py-4 font-bold rounded-xl flex items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                                        style={{ background: '#C9B59C', color: '#2c2419' }}>
+                                        {aiLoading ? (
+                                            <><span className="material-symbols-outlined animate-spin text-base">progress_activity</span>Analyzing...</>
+                                        ) : (
+                                            <><span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>magic_button</span>Analyze using AI</>
+                                        )}
+                                    </button>
+                                    {aiError && <AlertMessage type="error" message={aiError} />}
+                                    {aiUsed && !aiError && !aiLoading && <AlertMessage type="success" message="AI filled in the form! You can edit the fields below before submitting." />}
+                                    <div className="flex items-start gap-3 p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                        <span className="material-symbols-outlined text-sm mt-0.5" style={{ color: '#C9B59C' }}>info</span>
+                                        <p className="text-sm leading-snug" style={{ color: '#D9CFC7' }}>Our AI will analyze your description to auto-fill the details on the right, ensuring accurate matches.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <p
-                                className="text-sm mb-4"
-                                style={{ color: '#6b5e50' }}
-                            >
-                                Describe your problem in your own words and AI will
-                                automatically fill in the category, title, and
-                                urgency for you.
-                            </p>
-
-                            <textarea
-                                id="ai-description"
-                                value={aiDescription}
-                                onChange={(e) => setAiDescription(e.target.value)}
-                                placeholder='e.g. "mi s-a spart o țeavă în baie și curge apa peste tot"'
-                                rows={3}
-                                className="w-full px-4 py-3 rounded-lg outline-none transition resize-none"
-                                style={{
-                                    border: '1px solid #D9CFC7',
-                                    background: '#F9F8F6',
-                                    color: '#2c2419',
-                                }}
-                            />
-
-                            <button
-                                type="button"
-                                onClick={handleAiAnalyze}
-                                disabled={aiLoading || !aiDescription.trim()}
-                                className="mt-3 w-full py-3 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                style={{
-                                    background: aiLoading
-                                        ? '#A89882'
-                                        : '#2c2419',
-                                    color: '#F9F8F6',
-                                }}
-                            >
-                                {aiLoading ? (
-                                    <span className="flex items-center justify-center gap-2">
-                                        <svg
-                                            className="animate-spin h-4 w-4"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                        >
-                                            <circle
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                strokeWidth="4"
-                                                className="opacity-25"
-                                            />
-                                            <path
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                                className="opacity-75"
-                                            />
-                                        </svg>
-                                        Analyzing...
-                                    </span>
-                                ) : (
-                                    ' Analyze using AI'
-                                )}
-                            </button>
-
-                            {/* AI Error */}
-                            {aiError && (
-                                <div
-                                    className="mt-3 p-3 rounded-lg text-sm"
-                                    style={{
-                                        background: '#FEE2E2',
-                                        color: '#991B1B',
-                                        border: '1px solid #FECACA',
-                                    }}
-                                >
-                                    {aiError}
-                                </div>
-                            )}
-
-                            {/* AI Success */}
-                            {aiUsed && !aiError && !aiLoading && (
-                                <div
-                                    className="mt-3 p-3 rounded-lg text-sm"
-                                    style={{
-                                        background: '#D1FAE5',
-                                        color: '#065F46',
-                                        border: '1px solid #A7F3D0',
-                                    }}
-                                >
-                                    AI filled in the form! You can edit the
-                                    fields below before submitting.
-                                </div>
-                            )}
                         </div>
+                    </aside>
 
-                        {/* ── Job Form ─────────────────────────────────────── */}
-                        <div
-                            className="rounded-xl p-8"
-                            style={{
-                                background: '#EFE9E3',
-                                border: '1px solid #D9CFC7',
-                            }}
-                        >
-                            <form className="space-y-4" onSubmit={handleSubmit}>
+                    {/* Right: Job Form */}
+                    <section className="lg:col-span-7">
+                        <div className="p-8 md:p-12 rounded-[2rem]" style={{ background: '#FFFFFF', boxShadow: '0 24px 48px rgba(44, 36, 25, 0.04)' }}>
+                            <form className="space-y-8" onSubmit={handleSubmit}>
                                 {/* Category */}
                                 <div>
-                                    <label
-                                        htmlFor="category"
-                                        className="block text-sm font-medium mb-1"
-                                        style={{ color: '#6b5e50' }}
-                                    >
-                                        Category
-                                    </label>
-                                    <select
-                                        id="category"
-                                        value={category}
-                                        onChange={(e) =>
-                                            setCategory(e.target.value)
-                                        }
-                                        className="w-full px-4 py-2 rounded-lg outline-none transition"
-                                        style={{
-                                            border: '1px solid #D9CFC7',
-                                            background: '#F9F8F6',
-                                            color: '#2c2419',
-                                        }}
-                                    >
-                                        <option value="">Select a category</option>
+                                    <label className="block font-bold text-lg tracking-tight mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>Select Category</label>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         {CATEGORIES.map((cat) => (
-                                            <option key={cat} value={cat}>
-                                                {cat}
-                                            </option>
+                                            <button key={cat.value} type="button" onClick={() => setCategory(cat.value)}
+                                                className="flex flex-col items-center p-4 rounded-2xl transition-all duration-200 cursor-pointer"
+                                                style={{ background: category === cat.value ? '#FFFFFF' : '#F9F8F6', border: `2px solid ${category === cat.value ? '#2c2419' : 'transparent'}` }}>
+                                                <span className="material-symbols-outlined mb-2 text-2xl" style={{ color: '#2c2419' }}>{cat.icon}</span>
+                                                <span className="text-sm font-medium">{cat.label}</span>
+                                            </button>
                                         ))}
-                                    </select>
+                                    </div>
                                 </div>
 
                                 {/* Title */}
                                 <div>
-                                    <label
-                                        htmlFor="title"
-                                        className="block text-sm font-medium mb-1"
-                                        style={{ color: '#6b5e50' }}
-                                    >
-                                        Job Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="title"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        className="w-full px-4 py-2 rounded-lg outline-none transition"
-                                        style={{
-                                            border: '1px solid #D9CFC7',
-                                            background: '#F9F8F6',
-                                            color: '#2c2419',
-                                        }}
-                                    />
+                                    <label className="block font-bold text-lg tracking-tight mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>Job Title</label>
+                                    <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Kitchen Faucet Repair & Maintenance"
+                                        className="w-full px-4 py-3 rounded-xl outline-none transition-all text-sm" style={{ background: '#F9F8F6', border: 'none', color: '#2c2419' }} />
                                 </div>
 
                                 {/* Description */}
                                 <div>
-                                    <label
-                                        htmlFor="description"
-                                        className="block text-sm font-medium mb-1"
-                                        style={{ color: '#6b5e50' }}
-                                    >
-                                        Job Description
-                                    </label>
-                                    <textarea
-                                        id="description"
-                                        value={description}
-                                        onChange={(e) =>
-                                            setDescription(e.target.value)
-                                        }
-                                        rows={4}
-                                        className="w-full px-4 py-2 rounded-lg outline-none transition resize-none"
-                                        style={{
-                                            border: '1px solid #D9CFC7',
-                                            background: '#F9F8F6',
-                                            color: '#2c2419',
-                                        }}
-                                    />
+                                    <label className="block font-bold text-lg tracking-tight mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>Job Details</label>
+                                    <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe specific details about the job..." rows={4}
+                                        className="w-full px-4 py-3 rounded-xl outline-none transition-all resize-none text-sm" style={{ background: '#F9F8F6', border: 'none', color: '#2c2419' }} />
                                 </div>
 
                                 {/* Urgency */}
                                 <div>
-                                    <label
-                                        htmlFor="urgency"
-                                        className="block text-sm font-medium mb-1"
-                                        style={{ color: '#6b5e50' }}
-                                    >
-                                        Urgency
-                                    </label>
-                                    <select
-                                        id="urgency"
-                                        value={urgency}
-                                        onChange={(e) =>
-                                            setUrgency(e.target.value)
-                                        }
-                                        className="w-full px-4 py-2 rounded-lg outline-none transition"
-                                        style={{
-                                            border: '1px solid #D9CFC7',
-                                            background: '#F9F8F6',
-                                            color: '#2c2419',
-                                        }}
-                                    >
-                                        <option value="">Select urgency</option>
+                                    <label className="block font-bold text-lg tracking-tight mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>Urgency Level</label>
+                                    <div className="flex flex-wrap gap-3">
                                         {URGENCIES.map((u) => (
-                                            <option key={u.value} value={u.value}>
+                                            <button key={u.value} type="button" onClick={() => setUrgency(u.value)}
+                                                className="px-6 py-3 rounded-full font-semibold text-sm flex items-center gap-2 transition-all duration-200 cursor-pointer"
+                                                style={{ background: urgency === u.value ? u.bg : '#F9F8F6', color: urgency === u.value ? u.color : '#6b5e50', border: urgency === u.value ? `2px solid ${u.color}30` : '2px solid transparent' }}>
+                                                <span className="material-symbols-outlined text-sm">{u.icon}</span>
                                                 {u.label}
-                                            </option>
+                                            </button>
                                         ))}
-                                    </select>
-                                </div>
-
-                                {/* Price */}
-                                <div>
-                                    <label
-                                        htmlFor="price"
-                                        className="block text-sm font-medium mb-1"
-                                        style={{ color: '#6b5e50' }}
-                                    >
-                                        Budget (optional)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="price"
-                                        value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
-                                        placeholder="e.g. 200-400 RON"
-                                        className="w-full px-4 py-2 rounded-lg outline-none transition"
-                                        style={{
-                                            border: '1px solid #D9CFC7',
-                                            background: '#F9F8F6',
-                                            color: '#2c2419',
-                                        }}
-                                    />
-                                </div>
-
-                                {/* Submit Error */}
-                                {submitError && (
-                                    <div
-                                        className="p-3 rounded-lg text-sm"
-                                        style={{
-                                            background: '#FEE2E2',
-                                            color: '#991B1B',
-                                            border: '1px solid #FECACA',
-                                        }}
-                                    >
-                                        {submitError}
                                     </div>
-                                )}
+                                </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={submitting}
-                                    className="w-full py-3 text-sm font-semibold rounded-lg transition-all duration-200 hover:brightness-110 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                    style={{
-                                        background: submitting ? '#A89882' : '#C9B59C',
-                                        color: '#2c2419',
-                                    }}
-                                >
-                                    {submitting ? 'Creating…' : 'Create Job'}
-                                </button>
+                                {/* Budget & Submit */}
+                                <div className="pt-6 flex flex-col md:flex-row gap-6 items-center justify-between" style={{ borderTop: '1px solid #EFE9E3' }}>
+                                    <div className="w-full md:w-1/3">
+                                        <label className="block text-sm font-medium mb-1" style={{ color: '#6b5e50' }}>Estimated Budget (Optional)</label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold" style={{ color: '#6b5e50' }}>RON</span>
+                                            <input type="text" value={price} onChange={e => setPrice(e.target.value)} placeholder="0"
+                                                className="w-full pl-14 pr-4 py-3 rounded-xl outline-none transition-all text-sm" style={{ background: '#F9F8F6', border: 'none', color: '#2c2419' }} />
+                                        </div>
+                                    </div>
+                                    {submitError && <AlertMessage type="error" message={submitError} />}
+                                    <GradientButton type="submit" loading={submitting} disabled={submitting} size="lg">
+                                        Post Job Now
+                                    </GradientButton>
+                                </div>
                             </form>
                         </div>
-                    </div>
+                    </section>
                 </div>
-            </HeroBackground>
+            </main>
         </div>
     )
 }
