@@ -42,7 +42,7 @@ supabase/
 ## Features (MVP)
 
 - [x] Auth (email + password, role selection)
-- [ ] Job posting (homeowner creates repair request)
+- [x] Job posting (homeowner creates repair request)
 - [ ] Job feed (technicians browse & filter)
 - [ ] Offer system (price + message)
 - [ ] Chat (per-job messaging)
