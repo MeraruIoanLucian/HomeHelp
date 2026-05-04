@@ -97,7 +97,7 @@ export default function DashboardLayout() {
                         const isActive = location.pathname === item.to
                         return (
                             <Link key={i} to={item.to}
-                                className="flex items-center gap-3 rounded-xl px-4 py-3 mb-1 text-sm font-semibold transition-all duration-200 hover:translate-x-1"
+                                className="flex items-center gap-3 rounded-xl px-4 py-3 mb-1 text-sm font-semibold transition-all duration-200"
                                 style={{
                                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                                     background: isActive ? '#FFFFFF' : 'transparent',

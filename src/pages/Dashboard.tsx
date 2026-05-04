@@ -9,7 +9,6 @@ import technicianImg from '../assets/Tehnician.png'
 import { StatusBadge, UrgencyBadge } from '../components/StatusBadge'
 // componente
 import SectionHeading from '../components/SectionHeading'
-import CategoryIcon from '../components/CategoryIcon'
 import EmptyState from '../components/EmptyState'
 
 // tipuri
@@ -76,10 +75,10 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                 {cards.map((card, i) => (
                     <Link key={i} to={card.link}
-                        className="group relative rounded-[2rem] overflow-hidden transition-all duration-300 hover:-translate-y-2 block"
+                        className="group relative rounded-[2rem] overflow-hidden block"
                         style={{ background: '#FFFFFF', boxShadow: '0 24px 48px rgba(44, 36, 25, 0.06)' }}>
                         <div className="h-64 relative overflow-hidden">
-                            <img src={card.img} alt={card.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <img src={card.img} alt={card.title} className="w-full h-full object-cover" />
                             <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(44,36,25,0.5), transparent)' }} />
                             <div className="absolute bottom-6 left-8">
                                 <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider" style={{ background: card.badgeBg, color: '#2c2419' }}>
@@ -130,11 +129,9 @@ export default function Dashboard() {
                             {/* Job principal - card mare */}
                             {recentJobs[0] && (
                                 <div className="lg:col-span-2 rounded-[2rem] p-8 flex flex-col md:flex-row gap-8 items-center" style={{ background: '#EFE9E3' }}>
-                                    <div className="w-28 h-28 md:w-32 md:h-32 rounded-2xl flex items-center justify-center shrink-0" style={{ background: '#D9CFC7' }}>
-                                        <CategoryIcon category={recentJobs[0].category} size="lg" color="#6b5e50" />
-                                    </div>
+
                                     <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                        <div className="flex items-center gap-2 mb-6 flex-wrap">
                                             <StatusBadge status={recentJobs[0].status} />
                                             <UrgencyBadge urgency={recentJobs[0].urgency} />
                                             <span className="text-xs font-medium" style={{ color: '#6b5e50' }}>

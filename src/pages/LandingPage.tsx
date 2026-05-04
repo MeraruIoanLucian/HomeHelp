@@ -6,7 +6,6 @@ import wipImg from '../assets/WorkInProgress.png'
 import Logo from '../components/Logo'
 import GradientButton from '../components/GradientButton'
 import SectionHeading from '../components/SectionHeading'
-import { CATEGORIES } from '../components/CategoryIcon'
 
 // Hook pt fade-in la scroll
 function useFadeIn() {
@@ -46,6 +45,14 @@ const pillars = [
     { icon: 'auto_awesome', title: 'AI-Powered Matching', description: 'Describe your problem in plain language. Our AI analyzes it to find the right category, urgency, and expert.' },
 ]
 
+const CATEGORIES = [
+    { value: 'Instalații Apă', icon: 'plumbing', label: 'Plumbing', sub: 'Systems & Fixtures' },
+    { value: 'Electrice', icon: 'bolt', label: 'Electrical', sub: 'Power & Safety' },
+    { value: 'Gaze', icon: 'gas_meter', label: 'Gas', sub: 'Installation & Repair' },
+    { value: 'Centrale Termice', icon: 'device_thermostat', label: 'Heating', sub: 'Climate Control' },
+    { value: 'Climatizare', icon: 'ac_unit', label: 'HVAC', sub: 'Air Conditioning' },
+    { value: 'Altele', icon: 'handyman', label: 'Other', sub: 'General Repairs' },
+] as const
 
 export default function LandingPage() {
     return (

@@ -55,9 +55,9 @@ export default function ProfilePage() {
                 {/* Profile Header Card */}
                 <div
                     className="rounded-[2rem] p-8 md:p-12 mb-8 relative overflow-hidden"
-                    style={{ background: 'linear-gradient(135deg, #2c2419, #4a3f35)' }}
+                    style={{ background: '#4a3f35' }}
                 >
-                    <div className="absolute -top-32 -right-32 w-80 h-80 rounded-full blur-3xl" style={{ background: 'rgba(201, 181, 156, 0.15)' }} />
+                    <div className="absolute -top-32 -right-32 w-80 h-80 rounded-full blur-3xl" style={{ background: 'rgba(200, 180, 155, 0.15)' }} />
 
                     <div className="relative z-10 flex flex-col items-center text-center">
                         {/* Avatar */}

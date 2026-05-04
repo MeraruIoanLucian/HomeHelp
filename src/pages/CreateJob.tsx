@@ -5,12 +5,20 @@ import { supabase } from '../lib/supabase'
 import SectionHeading from '../components/SectionHeading'
 import GradientButton from '../components/GradientButton'
 import AlertMessage from '../components/AlertMessage'
-import { CATEGORIES } from '../components/CategoryIcon'
 
 const URGENCIES = [
     { value: 'low', label: 'Low', icon: 'check_circle', color: '#065F46', bg: '#D1FAE5' },
     { value: 'medium', label: 'Medium', icon: 'warning', color: '#92400E', bg: '#FEF3C7' },
     { value: 'urgent', label: 'Urgent', icon: 'priority_high', color: '#991B1B', bg: '#FEE2E2' },
+] as const
+
+const CATEGORIES = [
+    { value: 'Instalații Apă', icon: 'plumbing', label: 'Plumbing', sub: 'Systems & Fixtures' },
+    { value: 'Electrice', icon: 'bolt', label: 'Electrical', sub: 'Power & Safety' },
+    { value: 'Gaze', icon: 'gas_meter', label: 'Gas', sub: 'Installation & Repair' },
+    { value: 'Centrale Termice', icon: 'device_thermostat', label: 'Heating', sub: 'Climate Control' },
+    { value: 'Climatizare', icon: 'ac_unit', label: 'HVAC', sub: 'Air Conditioning' },
+    { value: 'Altele', icon: 'handyman', label: 'Other', sub: 'General Repairs' },
 ] as const
 
 interface AiResult { category: string; title: string; urgency: 'low' | 'medium' | 'urgent' }
@@ -69,7 +77,7 @@ export default function CreateJobPage() {
         try {
             const { error } = await supabase.from('jobs').insert({
                 owner_id: user.id, title: title.trim(), description: description.trim(),
-                category, urgency, budget: price.trim() || null, ai_generated: aiUsed,
+                category, urgency, budget: price.trim() || null,
             })
             if (error) throw new Error(error.message)
             navigate('/dashboard')

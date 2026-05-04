@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { Link } from 'react-router-dom'
 import SectionHeading from '../components/SectionHeading'
 import { StatusBadge, UrgencyBadge, type JobStatus } from '../components/StatusBadge'
-import CategoryIcon from '../components/CategoryIcon'
 import EmptyState from '../components/EmptyState'
 import AlertMessage from '../components/AlertMessage'
 
@@ -28,6 +28,7 @@ const TABS: { label: string; value: JobStatus | 'all' }[] = [
 ]
 
 export default function HelpedJobs() {
+    const navigate = useNavigate()
     const { user } = useAuth()
     const [jobs, setJobs] = useState<Job[]>([])
     const [loading, setLoading] = useState(true)
@@ -121,12 +122,6 @@ export default function HelpedJobs() {
                                         <UrgencyBadge urgency={job.urgency} />
                                     </div>
 
-                                    {/* Category */}
-                                    <div className="mb-4">
-                                        <CategoryIcon category={job.category} />
-                                        <span className="text-[10px] font-bold tracking-widest uppercase block mt-1" style={{ color: '#6b5e50' }}>{job.category}</span>
-                                    </div>
-
                                     {/* Title */}
                                     <h3 className="text-2xl md:text-3xl font-extrabold leading-tight mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2c2419' }}>
                                         {job.title}
@@ -152,8 +147,11 @@ export default function HelpedJobs() {
                                                 style={{ background: '#EFE9E3', color: '#2c2419' }}>
                                                 <span className="material-symbols-outlined text-sm">chat</span>Chat
                                             </Link>
-                                            {/* TODO: link catre pagina de detalii job */}
-                                            <button className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all duration-200" style={{ background: '#2c2419', color: '#F9F8F6' }}>
+                                            <button
+                                                onClick={() => navigate(`/jobs/${job.id}`)}
+                                                className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all duration-200"
+                                                style={{ background: '#2c2419', color: '#F9F8F6' }}
+                                            >
                                                 View Details
                                             </button>
                                         </div>

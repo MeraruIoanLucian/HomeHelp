@@ -11,7 +11,7 @@ export default function NotFoundPage() {
                     className="text-[10rem] md:text-[14rem] font-black leading-none tracking-tighter mb-4"
                     style={{
                         fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        background: 'linear-gradient(135deg, #C9B59C 0%, #2c2419 100%)',
+                        background: '#2c2419',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                     }}

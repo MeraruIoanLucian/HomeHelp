@@ -1,7 +1,6 @@
 type JobStatus = 'open' | 'assigned' | 'in_progress' | 'completed' | 'cancelled'
 type Urgency = 'low' | 'medium' | 'urgent'
 
-// TODO: ar trebui sa pun si icoane langa status
 const STATUS_MAP: Record<JobStatus, { bg: string; color: string; label: string }> = {
     open: { bg: '#C9B59C30', color: 'var(--brand-dark)', label: 'Open' },
     assigned: { bg: '#E0E7FF', color: '#3730A3', label: 'Assigned' },

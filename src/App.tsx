@@ -15,6 +15,7 @@ import Profile from './pages/Profile'
 import CreateJobPage from './pages/CreateJob'
 import NotFoundPage from './pages/NotFoundPage'
 import HelpedJobs from './pages/HelpedJobs'
+import JobDetails from './pages/JobDetails'
 import './index.css'
 
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/create-job" element={<CreateJobPage />} />
             <Route path="/helped-jobs" element={<HelpedJobs />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/jobs/:id" element={<JobDetails />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
