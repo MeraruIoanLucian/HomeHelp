@@ -143,7 +143,7 @@ export default function Dashboard() {
                                         </h4>
                                         <p className="text-sm" style={{ color: '#6b5e50' }}>{recentJobs[0].category}</p>
                                     </div>
-                                    <Link to="/helped-jobs" className="p-4 rounded-2xl transition-colors duration-200"
+                                    <Link to={`/jobs/${recentJobs[0].id}`} className="p-4 rounded-2xl transition-colors duration-200"
                                         style={{ background: '#FFFFFF', boxShadow: '0 2px 8px rgba(44,36,25,0.06)' }}>
                                         <span className="material-symbols-outlined" style={{ color: '#2c2419' }}>arrow_forward</span>
                                     </Link>

@@ -142,11 +142,15 @@ export default function HelpedJobs() {
                                             </span>
                                         </div>
                                         <div className="flex gap-3 w-full md:w-auto">
-                                            <Link to={`/chat/${job.id}`}
-                                                className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200"
+                                            <button
+                                                onClick={async () => {
+                                                    const { data: conv } = await supabase.from('conversations').select('id').eq('job_id', job.id).limit(1).maybeSingle()
+                                                    if (conv) navigate(`/chat/${conv.id}`)
+                                                }}
+                                                className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
                                                 style={{ background: '#EFE9E3', color: '#2c2419' }}>
                                                 <span className="material-symbols-outlined text-sm">chat</span>Chat
-                                            </Link>
+                                            </button>
                                             <button
                                                 onClick={() => navigate(`/jobs/${job.id}`)}
                                                 className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold transition-all duration-200"

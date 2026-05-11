@@ -16,6 +16,8 @@ import CreateJobPage from './pages/CreateJob'
 import NotFoundPage from './pages/NotFoundPage'
 import HelpedJobs from './pages/HelpedJobs'
 import JobDetails from './pages/JobDetails'
+import Chat from './pages/Chat'
+import ChatRoom from './pages/ChatRoom'
 import './index.css'
 
 export default function App() {
@@ -39,6 +41,8 @@ export default function App() {
             <Route path="/helped-jobs" element={<HelpedJobs />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/jobs/:id" element={<JobDetails />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/chat/:conversationId" element={<ChatRoom />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
